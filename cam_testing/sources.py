@@ -405,9 +405,10 @@ def check(version):
 
 
 def system_table(system):
-    '''The data_table of a system model's obs_data (<model>_obs_data.json beside it).'''
-    obs_path = os.path.join(system.dir, f'{system.name}_obs_data.json')
-    return data_table(system.dir, obs=read_obs(obs_path), obs_path=obs_path)
+    '''The data_table of a system model's obs_data (<model>_obs_data.json in its calibration_dir, with
+    SOURCES.md).'''
+    obs_path = os.path.join(system.calibration_dir, f'{system.name}_obs_data.json')
+    return data_table(system.calibration_dir, obs=read_obs(obs_path), obs_path=obs_path)
 
 
 def check_system(system):

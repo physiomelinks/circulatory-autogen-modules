@@ -10,6 +10,7 @@ import os
 import shutil
 
 from cam_testing import paths
+from cam_testing.system import parameters_path
 
 SOURCE = os.path.join('boundary_conditions', 'outlet_pressure', 'versions', 'constant')
 MT, VERSION = 'ext_outlet_pressure', 'constant'
@@ -70,7 +71,8 @@ def make(root, library=None, pyproject=True):
     with open(os.path.join(sdir, f'{SYSTEM}_module_array.json'), 'w') as f:
         json.dump(SYSTEM_RECORDS, f, indent=1)
     from libcuflynx.utilities import parameters_file as pf
-    pf.write_parameter_rows(os.path.join(sdir, f'{SYSTEM}_parameters.json'),
+    os.makedirs(os.path.dirname(parameters_path(sdir)))
+    pf.write_parameter_rows(parameters_path(sdir),
                             [{'variable_name': name, 'units': units, 'value': str(value), 'data_reference': ref}
                              for name, units, value, ref in verification['harness']['parameters']])
     with open(os.path.join(sdir, f'{SYSTEM}_system.yaml'), 'w') as f:

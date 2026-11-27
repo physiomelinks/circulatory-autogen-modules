@@ -128,3 +128,20 @@ def system_data_sources_test(system):
         pytest.skip(r.message)
     if r.status == checks.FAILED:
         pytest.fail(r.message + '\n' + '\n'.join(r.details), pytrace=False)
+
+
+@pytest.mark.parametrize('system', [pytest.param(s, id=s.id) for s in SYSTEMS])
+def system_workflow_current_test(system):
+    '''A model with a calibration workflow has its default set calibrated from the inputs in uncalibrated/ as
+    they are now (default_calibration.json records them): a module recalibration writes into uncalibrated/ and
+    leaves the workflow stale until it is run again and its result written (python -m cam_testing.system
+    write-default). Nothing is simulated.'''
+    stale = systems.workflow_stale(system)
+    if stale is None:
+        pytest.skip('no calibration workflow')
+    if stale:
+        systems.save_result(system, 'system_workflow_current_test', 'failed', '; '.join(stale))
+        _known(system, 'system_workflow_current_test', f'calibration workflow stale, rerun it to refresh default: '
+                                                       f'{"; ".join(stale)}')
+    systems.save_result(system, 'system_workflow_current_test', 'passed', 'default is the workflow\'s result for '
+                                                                          'the inputs in uncalibrated/')

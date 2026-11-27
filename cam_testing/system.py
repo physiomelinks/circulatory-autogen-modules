@@ -3,8 +3,21 @@ System models: system_models/<category>/<model>/ (at the repo root; not modules,
 
 Each system dir holds the model built from this module library (<model>_module_array.json, whose
 records (instances) name a module_type, its version (module_subtype) and the parameterisation
-it uses, and <model>_parameters.json, whose values win over the parameterisations'), the reference it must reproduce under
-reference/, and a spec <model>_system.yaml. The model is generated with every module library
+it uses), its parameter sets under parameterisations/ (values that win over the module
+parameterisations'), the reference it must reproduce under reference/, and a spec <model>_system.yaml.
+
+Parameter sets:
+
+  parameterisations/default/default_parameters.json
+      the model's values: what generation, the tests and users get unless the spec's
+      "parameterisation" names another set. For a model with a calibration workflow it is the
+      workflow's result (python -m cam_testing.system write-default), and nothing else writes it;
+      default_calibration.json records the inputs it was calibrated from.
+  parameterisations/uncalibrated/
+      only for a model with a calibration workflow: the workflow's input, uncalibrated_parameters.json,
+      with <model>_calibration_workflow.json, its obs_data, params_for_id, protocols/ and SOURCES.md.
+      A module recalibration (python -m cam_testing.calibrate apply) writes here, never into default,
+      and leaves the workflow stale (workflow_stale) until it is run again. The model is generated with every module library
 (cam_testing.paths: this repo's modules/, then the extra ones), so its records may name versions of
 either. The reference is one of:
 
@@ -28,6 +41,9 @@ The tests:
                            agrees to equivalence.tol (normalised max difference) with both
                            simulated at equivalence.solver_info
   system_invariants_test   the spec's invariants (as for modules)
+  system_workflow_current_test
+                           a model with a calibration workflow: its default set is the workflow's
+                           result for the inputs in uncalibrated/ now (workflow_stale)
 """
 import contextlib
 import glob
@@ -82,6 +98,85 @@ class System:
     def plots_dir(self):
         return os.path.join(self.dir, 'plots')
 
+    @property
+    def parameterisation(self):
+        '''The parameter set the model is generated with: the spec's "parameterisation", else default.'''
+        return self.spec.get('parameterisation') or DEFAULT
+
+    @property
+    def parameters_path(self):
+        return parameters_path(self.dir, self.parameterisation)
+
+    @property
+    def workflow_path(self):
+        '''uncalibrated/<model>_calibration_workflow.json, None when the model has no workflow.'''
+        path = os.path.join(self.dir, PARAMETERISATIONS, UNCALIBRATED, f'{self.name}_calibration_workflow.json')
+        return path if os.path.isfile(path) else None
+
+    @property
+    def calibration_dir(self):
+        '''Where the model's calibration data are (obs_data, SOURCES.md): uncalibrated/ when the model has a
+        workflow, else the model's directory.'''
+        return os.path.dirname(self.workflow_path) if self.workflow_path else self.dir
+
+
+PARAMETERISATIONS, DEFAULT, UNCALIBRATED = 'parameterisations', 'default', 'uncalibrated'
+# beside default_parameters.json: the sha256 of each workflow input it was calibrated from
+CALIBRATION_RECORD = 'default_calibration.json'
+
+
+def parameters_path(model_dir, parameterisation=DEFAULT):
+    '''parameterisations/<p>/<p>_parameters.json of the system model in model_dir.'''
+    return os.path.join(model_dir, PARAMETERISATIONS, parameterisation, f'{parameterisation}_parameters.json')
+
+
+def _workflow_inputs(system):
+    '''{path relative to uncalibrated/: sha256} of every file there but notes (*.md).'''
+    from libcuflynx.calibration_workflow.runner import sha256
+    root = os.path.dirname(system.workflow_path)
+    out = {}
+    for d, dirs, files in os.walk(root):
+        dirs.sort()
+        for f in sorted(files):
+            if not f.endswith('.md') and not f.startswith('.'):
+                path = os.path.join(d, f)
+                out[os.path.relpath(path, root).replace(os.sep, '/')] = sha256(path)
+    return out
+
+
+def workflow_stale(system):
+    '''Why the model's default set is not its workflow's result for the inputs in uncalibrated/ now
+    ([] when it is; None when the model has no workflow): no record of a calibration, or inputs
+    changed, added or removed since (e.g. a module recalibration wrote into uncalibrated/).'''
+    if not system.workflow_path:
+        return None
+    record_path = os.path.join(system.dir, PARAMETERISATIONS, DEFAULT, CALIBRATION_RECORD)
+    if not os.path.isfile(record_path):
+        return [f'default has no {CALIBRATION_RECORD}: it was not written by the workflow']
+    with open(record_path) as f:
+        then = json.load(f).get('inputs') or {}
+    now = _workflow_inputs(system)
+    return ([f'{p} changed' for p in sorted(now) if p in then and then[p] != now[p]]
+            + [f'{p} added' for p in sorted(set(now) - set(then))]
+            + [f'{p} removed' for p in sorted(set(then) - set(now))])
+
+
+def write_default(system, run_dir):
+    '''Writes the workflow run in run_dir (complete and current) as the default set, with its record;
+    returns the default parameters path.'''
+    import datetime
+    from libcuflynx.calibration_workflow.runner import write_calibrated_parameters_to
+    if not system.workflow_path:
+        raise ValueError(f'{system.id} has no calibration workflow ({UNCALIBRATED}/{system.name}_calibration_workflow.json)')
+    path = parameters_path(system.dir)
+    write_calibrated_parameters_to(system.workflow_path, run_dir, path, module_library_dirs=library_dirs())
+    record = {'date': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d'),
+              'inputs': _workflow_inputs(system)}
+    with open(os.path.join(os.path.dirname(path), CALIBRATION_RECORD), 'w') as f:
+        json.dump(record, f, indent=1)
+        f.write('\n')
+    return path
+
 
 def system_models():
     out = []
@@ -113,9 +208,10 @@ def generate(system, work_dir, reference=False, quiet=True):
 
     resources = os.path.join(system.dir, 'reference') if reference else system.dir
     out_dir = os.path.join(work_dir, 'reference' if reference else 'library')
+    params = f'{system.name}_parameters.json' if reference else os.path.relpath(system.parameters_path, system.dir)
     config = {
         'file_prefix': system.name,
-        'input_param_file': f'{system.name}_parameters.json',
+        'input_param_file': params,
         'model_type': 'cellml', 'solver': 'CVODE_myokit',
         'resources_dir': resources, 'generated_models_dir': out_dir, 'DEBUG': False,
     }
@@ -331,7 +427,13 @@ def main(argv=None):
     w = sub.add_parser('write-reference', help="write reference/<model>.cellml from circulatory_autogen's original "
                                                "(with libcuflynx's built-in modules)")
     w.add_argument('systems', nargs='*', help='category/model or model; default: every system model with an original')
+    d = sub.add_parser('write-default', help="write a calibration workflow's run as the model's default parameter set")
+    d.add_argument('system', help='category/model or model')
+    d.add_argument('run_dir', help="the workflow's output directory (a complete, current run)")
     args = ap.parse_args(argv)
+    if args.cmd == 'write-default':
+        print(f'wrote {write_default(load_system(args.system), args.run_dir)}')
+        return 0
     chosen = [load_system(s) for s in args.systems] or [s for s in system_models() if has_original(s)]
     failed = 0
     for s in chosen:

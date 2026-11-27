@@ -29,6 +29,9 @@ import os
 import re
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from cam_testing.system import parameters_path  # noqa: E402
+
 HEART_TYPES = ('cardiac_clock', 'chamber', 'valve')
 # a written-out submodule version -> the supermodule's version of the same maths
 SAME_MATHS = {('chamber', 'Liang2009NoVisco_v01'): 'Liang2009NoVisco_v02'}
@@ -144,7 +147,7 @@ def rename_path(text_name, local):
 def convert_parameters(model_dir, prefix, local, folded, library):
     from libcuflynx import upgrade
     from libcuflynx.utilities.parameters_file import read_parameters_file, write_parameters_file
-    path = os.path.join(model_dir, f'{prefix}_parameters.json')
+    path = parameters_path(model_dir)
     doc = read_parameters_file(path) if os.path.exists(path) else {'schema_version': 1}
     own = {local[k]: doc.pop(k) for k in list(doc) if k in local}
     for j in folded:
@@ -154,7 +157,7 @@ def convert_parameters(model_dir, prefix, local, folded, library):
     doc.pop(INSTANCE, None)
     write_parameters_file(path, doc)
     upgrade.main(['supermodule-instances', os.path.join(model_dir, f'{prefix}_module_array.json'),
-                  '--module-library-dir', library, '--no-builtin-modules', '--replace'])
+                  '--parameters', path, '--module-library-dir', library, '--no-builtin-modules', '--replace'])
     doc = read_parameters_file(path)
     for sub, values in own.items():
         doc[INSTANCE].setdefault(sub, {}).update(values)

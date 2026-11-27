@@ -27,6 +27,7 @@ sys.path.insert(0, REPO)
 sys.path.insert(0, os.path.join(REPO, 'tools'))
 from cam_testing import module_array  # noqa: E402
 from parameter_files import write_model_parameters  # noqa: E402
+from cam_testing.system import parameters_path  # noqa: E402
 OUT = os.path.join(REPO, 'modules', 'system', 'poiseuille')
 
 SIDE = 2.0e-5        # m, square cross-section side
@@ -158,7 +159,7 @@ def write(model, case):
     rows.append(['outlet', 'nn', 'poiseuille_transport_outlet', f'f{N}', ''])
     array = module_array.write_records(os.path.join(d, f'{model}_module_array.json'),
                                        module_array.from_rows(rows))
-    write_model_parameters(os.path.join(d, f'{model}_parameters.json'), [dict(zip(('variable_name', 'units', 'value', 'data_reference'), map(str, r))) for r in params], array,
+    write_model_parameters(parameters_path(d), [dict(zip(('variable_name', 'units', 'value', 'data_reference'), map(str, r))) for r in params], array,
                            [os.path.join(REPO, 'modules')])
 
     spec_path = os.path.join(d, f'{model}_system.yaml')

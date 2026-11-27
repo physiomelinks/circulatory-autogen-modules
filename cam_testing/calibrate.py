@@ -509,9 +509,11 @@ def write_calibrated(cm, calibrated, metrics, passed, summary):
 #      <instance>/<var> of every instance of the version (soma/sympathetic: i_M/rho_M), and
 #      <instance>/<path>/<var> through an instance of a supermodule over it (a neuron using that soma as
 #      "soma": soma/i_M/rho_M);
-#   3. every system model whose module array uses the version, or a supermodule chain over it: in its
-#      parameters file (<model>_parameters.json), <vessel>/<var> or <vessel>/<submodule path>/<var>
-#      (heart/lv/E_A, SN/soma/i_M/rho_M);
+#   3. every system model whose module array uses the version, or a supermodule chain over it:
+#      <vessel>/<var> or <vessel>/<submodule path>/<var> (heart/lv/E_A, SN/soma/i_M/rho_M) in its
+#      parameters: the uncalibrated set when it has a calibration workflow (but a value that set gives
+#      its own origin), which leaves the workflow stale until it is run again (its default set is the
+#      workflow's result and keeps the values fitted to the old ones); else its default set;
 #   4. the monolithic counterparts a supermodule spec declares (supermodule.equivalent: {model,
 #      reproduces, output_map}): the flattened vessel of (3) in `model` is mapped through output_map
 #      to the vessel of `reproduces` ("soma_SN/w": "SN__soma__i_M/w" -> soma_SN), giving <that vessel>/<var>
@@ -523,8 +525,11 @@ def write_calibrated(cm, calibrated, metrics, passed, summary):
 
 
 def _system_models(root=None):
-    """[{key, dir, vessels, array_path, parameters_path}] of every system model under ``root``."""
+    """[{key, dir, vessels, array_path, parameters_path, workflow}] of every system model under ``root``:
+    parameters_path the set a module recalibration writes into, its uncalibrated set when it has a
+    calibration workflow (``workflow`` True), else its default set."""
     from cam_testing import paths
+    from cam_testing.system import DEFAULT, PARAMETERISATIONS, UNCALIBRATED, parameters_path
     root = root or paths.roots().system_models_dir
     out = []
     for d, _dirs, files in os.walk(root):
@@ -533,9 +538,11 @@ def _system_models(root=None):
                 name = f[:-len('_module_array.json')]
                 with open(os.path.join(d, f)) as fh:
                     vessels = json.load(fh)
+                workflow = os.path.isfile(os.path.join(d, PARAMETERISATIONS, UNCALIBRATED,
+                                                       f'{name}_calibration_workflow.json'))
                 out.append({'key': os.path.relpath(d, root).replace(os.sep, '/'), 'dir': d, 'vessels': vessels,
-                            'array_path': os.path.join(d, f),
-                            'parameters_path': os.path.join(d, f'{name}_parameters.json')})
+                            'array_path': os.path.join(d, f), 'workflow': workflow,
+                            'parameters_path': parameters_path(d, UNCALIBRATED if workflow else DEFAULT)})
     return sorted(out, key=lambda m: m['key'])
 
 
@@ -633,6 +640,7 @@ def apply_plan(version, parameterisation_name, versions=None, systems=None):
     today = datetime.date.today().isoformat()
     obs_rel = os.path.relpath(inst.obs_data_path, version.dir).replace(os.sep, '/')
     plan, seen, docs = [], set(), {}
+    uncalibrated = {m['parameters_path'] for m in systems if m.get('workflow')}
     for path, kind, prefix, where, own in targets:
         if path not in docs:
             docs[path] = _document(path, kind)
@@ -642,7 +650,7 @@ def apply_plan(version, parameterisation_name, versions=None, systems=None):
         for n in names:
             row = prefix + n
             leaf = pf.get_leaf(doc, row.split('/'))
-            if leaf is None or (path, row) in seen:
+            if leaf is None or (path, row) in seen or (path in uncalibrated and leaf.get('origin')):
                 continue
             seen.add((path, row))
             to = obs_rel if own else f'{version.mtype.name} {version.name} {obs_rel}'
@@ -671,10 +679,17 @@ def write_plan(plan):
         pf.write_parameters_file(path, doc)
 
 
+def stale_workflows(plan, systems):
+    '''Keys of the system models whose uncalibrated set ``plan`` changes: their workflows are then stale.'''
+    keys = {m['parameters_path']: m['key'] for m in systems if m.get('workflow')}
+    return sorted({keys[c['path']] for c in plan if c['path'] in keys})
+
+
 def apply_command(version_key, parameterisation_name, dry_run=False, versions=None, systems=None, out=print):
     from cam_testing import paths
     from cam_testing.library import version_by_key
     version = version_by_key(version_key)
+    systems = _system_models() if systems is None else systems
     plan = apply_plan(version, parameterisation_name, versions=versions, systems=systems)
     for c in plan:
         rel = os.path.relpath(c['path'], paths.roots().repo_root)
@@ -682,6 +697,9 @@ def apply_command(version_key, parameterisation_name, dry_run=False, versions=No
     if not dry_run:
         write_plan(plan)
     out(f'{len(plan)} row(s){" (dry run: nothing written)" if dry_run else ""}')
+    for key in stale_workflows(plan, systems):
+        out(f'system model {key}: its calibration workflow is {"would be " if dry_run else ""}stale: rerun it to '
+            f'refresh its default set (python -m cam_testing.system write-default {key} <run dir>)')
     return plan
 
 def main(argv=None):

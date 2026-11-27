@@ -97,15 +97,26 @@ def _library(tmp):
              {'mono_C/E_A': 1}),
             ('sys_body', [{'name': 'B', 'module_type': 'body', 'module_subtype': 'o1', 'parameterisation': 'default'}],
              {'B/heart/ra/E_A': 3, 'B/heart/ra/k': 7, 'B/heart/lv/E_A': 1, 'B/heart/lv/k': 7})):
-        path = os.path.join(tmp, 'system_models', key, f'{key}_parameters.json')
-        doc = pf.new_document()
-        for name, x in body_values.items():
-            pf.set_leaf(doc, name.split('/'), _leaf(x, 'model'))
-        pf.write_parameters_file(path, doc)
-        systems.append({'key': key, 'dir': os.path.dirname(path), 'vessels': vessels,
-                        'array_path': os.path.join(os.path.dirname(path), f'{key}_module_array.json'),
-                        'parameters_path': path})
-    return chamber, [chamber, heart, body, single, mono], systems
+        _system_model(tmp, key, vessels, body_values)
+        systems.append(key)
+    # in the order above (_system_models sorts by key)
+    found = {m['key']: m for m in calibrate._system_models(os.path.join(tmp, 'system_models'))}
+    return chamber, [chamber, heart, body, single, mono], [found[k] for k in systems]
+
+
+def _system_model(tmp, key, vessels, values, parameterisation='default'):
+    '''system_models/<key>/: its module array and the parameter set ``parameterisation`` holding ``values``
+    ({path: value, or a leaf}).'''
+    d = os.path.join(tmp, 'system_models', key)
+    path = os.path.join(d, 'parameterisations', parameterisation, f'{parameterisation}_parameters.json')
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(os.path.join(d, f'{os.path.basename(key)}_module_array.json'), 'w') as f:
+        json.dump(vessels, f)
+    doc = pf.new_document()
+    for name, x in values.items():
+        pf.set_leaf(doc, name.split('/'), x if isinstance(x, dict) else _leaf(x, 'model'))
+    pf.write_parameters_file(path, doc)
+    return path
 
 
 def test_a_chamber_calibration_updates_every_chamber_instance_in_the_heart_s_template(tmp_path):
@@ -151,16 +162,16 @@ def test_apply_plan_and_write(tmp_path):
         ('modules/heart/s1/parameterisations/default/default_parameters.json', 'lv/E_A'),
         ('modules/body/o1/parameterisations/default/default_parameters.json', 'heart/lv/E_A'),
         ('modules/heart/single/parameterisations/default/default_parameters.json', 'chamber/E_A'),
-        ('system_models/sys_flat/sys_flat_parameters.json', 'C_ch/E_A'),
-        ('system_models/sys_flat/sys_flat_parameters.json', 'D_ch/E_A'),
-        ('system_models/sys_super/sys_super_parameters.json', 'C/lv/E_A'),
-        ('system_models/sys_super/sys_super_parameters.json', 'C/ra/E_A'),
-        ('system_models/sys_super/sys_super_parameters.json', 'E/lv/E_A'),
-        ('system_models/sys_super/sys_super_parameters.json', 'E/ra/E_A'),
-        ('system_models/sys_mono/sys_mono_parameters.json', 'mono_C/E_A'),
+        ('system_models/sys_flat/parameterisations/default/default_parameters.json', 'C_ch/E_A'),
+        ('system_models/sys_flat/parameterisations/default/default_parameters.json', 'D_ch/E_A'),
+        ('system_models/sys_super/parameterisations/default/default_parameters.json', 'C/lv/E_A'),
+        ('system_models/sys_super/parameterisations/default/default_parameters.json', 'C/ra/E_A'),
+        ('system_models/sys_super/parameterisations/default/default_parameters.json', 'E/lv/E_A'),
+        ('system_models/sys_super/parameterisations/default/default_parameters.json', 'E/ra/E_A'),
+        ('system_models/sys_mono/parameterisations/default/default_parameters.json', 'mono_C/E_A'),
         ('modules/heartmono/m1/parameterisations/default/default_parameters.json', 'E_A'),
-        ('system_models/sys_body/sys_body_parameters.json', 'B/heart/lv/E_A'),
-        ('system_models/sys_body/sys_body_parameters.json', 'B/heart/ra/E_A'),
+        ('system_models/sys_body/parameterisations/default/default_parameters.json', 'B/heart/lv/E_A'),
+        ('system_models/sys_body/parameterisations/default/default_parameters.json', 'B/heart/ra/E_A'),
     }
     assert all(c['value'] == repr(2.5000001) for c in plan)          # full precision from calibration.json
     own = next(c for c in plan if c['path'] == chamber.default_parameterisation.parameters_path)
@@ -194,3 +205,39 @@ def test_apply_dry_run_writes_nothing(tmp_path, monkeypatch):
     plan = calibrate.apply_command('chamber/v1', 'fit', dry_run=True, versions=versions, systems=systems, out=lines.append)
     assert len(plan) == 15 and lines[-1].startswith('15 row(s)') and 'dry run' in lines[-1]
     assert all(open(p).read() == t for p, t in before.items())
+
+
+def test_a_model_with_a_workflow_gets_the_values_in_its_uncalibrated_set_and_its_workflow_is_stale(tmp_path):
+    """A system model with a calibration workflow gets a module recalibration in its uncalibrated set (the
+    workflow's input), never in its default set (the workflow's result), and keeps a value that set gives its
+    own origin; apply reports the workflow stale. A model without one gets it in its default set."""
+    tmp = str(tmp_path)
+    chamber, versions, _ = _library(tmp)
+    vessels = [{'name': 'C_ch', 'module_type': 'chamber', 'module_subtype': 'v1', 'parameterisation': 'default'},
+               {'name': 'D_ch', 'module_type': 'chamber', 'module_subtype': 'v1', 'parameterisation': 'default'}]
+    default = _system_model(tmp, 'cat/sys_wf', vessels, {'C_ch/E_A': 9, 'D_ch/E_A': 9})
+    own = dict(_leaf(4, 'measured by us'), origin='measured')
+    uncalibrated = _system_model(tmp, 'cat/sys_wf', vessels, {'C_ch/E_A': 1, 'D_ch/E_A': own}, 'uncalibrated')
+    with open(os.path.join(os.path.dirname(uncalibrated), 'sys_wf_calibration_workflow.json'), 'w') as f:
+        f.write('{}')
+    systems = calibrate._system_models(os.path.join(tmp, 'system_models'))
+    wf = next(m for m in systems if m['key'] == 'cat/sys_wf')
+    assert wf['workflow'] and wf['parameters_path'] == uncalibrated
+    assert next(m for m in systems if m['key'] == 'sys_flat')['parameters_path'].endswith(
+        os.path.join('sys_flat', 'parameterisations', 'default', 'default_parameters.json'))
+    before = open(default).read()
+    lines = []
+    from cam_testing import library
+    import pytest
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(library, 'version_by_key', lambda key: chamber)
+        calibrate.apply_command('chamber/v1', 'fit', versions=versions, systems=systems, out=lines.append)
+    doc = _read(uncalibrated, pf.MODEL)
+    assert doc['C_ch']['E_A']['value'] == repr(2.5000001)
+    assert doc['D_ch']['E_A'] == dict(own, value='4')                     # its own origin: kept
+    assert open(default).read() == before                                # the workflow's result: untouched
+    assert _read(next(m for m in systems if m['key'] == 'sys_flat')['parameters_path'], pf.MODEL)[
+        'C_ch']['E_A']['value'] == repr(2.5000001)
+    assert [x for x in lines if 'stale' in x] == [
+        'system model cat/sys_wf: its calibration workflow is stale: rerun it to refresh its default set '
+        '(python -m cam_testing.system write-default cat/sys_wf <run dir>)']

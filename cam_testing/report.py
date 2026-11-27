@@ -1461,6 +1461,7 @@ def _system_mermaid(instances, edges):
 def system_context(system, href_of=None, page_dir=None):
     '''The system page's context. href_of(version) is the version page's href from the page (default:
     relative to page_dir, the system model's directory).'''
+    from cam_testing import system as system_mod
     page_dir = page_dir or system.dir
     href_of = href_of or (lambda v: os.path.relpath(v.html_path, page_dir).replace(os.sep, '/'))
     records = _system_records(system)
@@ -1487,8 +1488,9 @@ def system_context(system, href_of=None, page_dir=None):
         'sim': {k: spec.get(k) for k in ('sim_time', 'pre_time', 'dt') if spec.get(k) is not None},
         'instances': instances, 'edges': edges, 'figure': figure,
         'mermaid': None if figure else _system_mermaid(instances, edges),
-        'parameters': _parameter_groups(os.path.join(system.dir, f'{system.name}_parameters.json')),
-        'parameters_file': f'{system.name}_parameters.json',
+        'parameters': _parameter_groups(system.parameters_path),
+        'parameters_file': os.path.relpath(system.parameters_path, system.dir).replace(os.sep, '/'),
+        'workflow_stale': system_mod.workflow_stale(system),
         'tests': tests, 'counts': counts, 'plots': _system_plots(system),
         'sources': sources_table(sources.system_table(system), system.dir),
         'generated': _now(), 'libcuflynx_version': _libcuflynx_version(),

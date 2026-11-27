@@ -27,8 +27,10 @@ import yaml
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODULES = os.path.join(REPO, 'modules')
+sys.path.insert(0, REPO)
 sys.path.insert(0, os.path.join(REPO, 'tools'))
 from parameter_files import write_model_parameters  # noqa: E402
+from cam_testing.system import parameters_path  # noqa: E402
 OUT = os.path.join(REPO, 'system_models', 'coupled')
 N = 3   # grid cells per direction (--n): the CellML grid has N^3 cells and 3 N^2 (N - 1) faces
 H_O2, H_NE = 2e-5, 1e-6   # cell sizes: the tissue_diffusion_volume default cell, and the varicosity volume
@@ -161,7 +163,7 @@ def write(model, records, params, spec):
     with open(os.path.join(d, f'{model}_module_array.json'), 'w') as f:
         f.write('[\n' + ',\n'.join(' ' + json.dumps(r) for r in records) + '\n]\n')
     array = os.path.join(d, f'{model}_module_array.json')
-    write_model_parameters(os.path.join(d, f'{model}_parameters.json'), [dict(zip(('variable_name', 'units', 'value', 'data_reference'), map(str, r))) for r in params], array, [MODULES])
+    write_model_parameters(parameters_path(d), [dict(zip(('variable_name', 'units', 'value', 'data_reference'), map(str, r))) for r in params], array, [MODULES])
     spec_path = os.path.join(d, f'{model}_system.yaml')
     if not os.path.isfile(spec_path):
         with open(spec_path, 'w') as f:

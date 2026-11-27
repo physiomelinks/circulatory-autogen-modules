@@ -395,28 +395,47 @@ def test_system_models_directory_layout():
 
 
 def _check_system_model(mdir, problems):
-    '''One system model's name, files and directories against the schema's system_model level.'''
+    '''One system model's name, files and directories against the schema's system_model level and the
+    levels of its subdirectories (its parameter sets).'''
     model = os.path.basename(mdir)
     _name_ok('system_model', model, mdir, problems)
-    _check_files('system_model', mdir, {'model': model}, problems)
-    for c in _subdirs(mdir):
-        if c not in {_fill(x, {'model': model}) for x in LEVELS['system_model']['directories']}:
-            problems.append(f'{os.path.relpath(mdir, REPO_ROOT)}: unexpected directory {c}')
+    _check_system_level('system_model', mdir, {'model': model}, problems)
+
+
+def _check_system_level(level, d, names, problems):
+    '''A directory's files, its directories (those the level allows; its required_directories present),
+    and each subdirectory the level gives a level of its own (subdirectory_levels), recursively.'''
+    spec = LEVELS[level]
+    _check_files(level, d, names, problems)
+    rel = os.path.relpath(d, REPO_ROOT)
+    subdirs = _subdirs(d)
+    for c in subdirs:
+        if c not in {_fill(x, names) for x in spec.get('directories', [])}:
+            problems.append(f'{rel}: unexpected directory {c}')
+        elif c in spec.get('subdirectory_levels', {}):
+            _check_system_level(spec['subdirectory_levels'][c], os.path.join(d, c), names, problems)
+    for c in spec.get('required_directories', []):
+        if c not in subdirs:
+            problems.append(f'{rel}: missing directory {c}/')
 
 
 SYSTEM_ARRAYS = sorted(glob.glob(os.path.join(SYSTEM_MODELS_DIR, '*', '*', '*_module_array.json')))
+# (module array, parameter set) of every system model: each set is generated with the array
+SYSTEM_PARAMETER_SETS = [(a, p) for a in SYSTEM_ARRAYS
+                         for p in sorted(glob.glob(os.path.join(os.path.dirname(a), 'parameterisations', '*',
+                                                                '*_parameters.json')))]
 
 
-@pytest.mark.parametrize('path', SYSTEM_ARRAYS, ids=lambda p: os.path.relpath(os.path.dirname(p), SYSTEM_MODELS_DIR))
-def test_system_model_supermodule_instances_have_their_values(path):
-    '''Each supermodule instance of a system model has an entry in the model's parameters file
-    ({model}_parameters.json, libcuflynx's nested JSON), which libcuflynx reads; a new one is written with
-    cuflynx-upgrade supermodule-instances.'''
+@pytest.mark.parametrize('path,parameters', SYSTEM_PARAMETER_SETS,
+                         ids=lambda x: os.path.relpath(x, SYSTEM_MODELS_DIR).replace(os.sep, '/'))
+def test_system_model_supermodule_instances_have_their_values(path, parameters):
+    '''Each supermodule instance of a system model has an entry in each of the model's parameter sets
+    (parameterisations/<p>/<p>_parameters.json, libcuflynx's nested JSON), which libcuflynx reads; a new one
+    is written with cuflynx-upgrade supermodule-instances --parameters <that set>.'''
     from libcuflynx.utilities.supermodules import check_model_instances
-    from libcuflynx.utilities.config_schemas import read_module_array_records, model_parameters_path
+    from libcuflynx.utilities.config_schemas import read_module_array_records
     try:
-        check_model_instances(read_module_array_records(path), _supermodule_registry(), path,
-                              model_parameters_path(path))
+        check_model_instances(read_module_array_records(path), _supermodule_registry(), path, parameters)
     except ValueError as e:
         pytest.fail(str(e))
 
