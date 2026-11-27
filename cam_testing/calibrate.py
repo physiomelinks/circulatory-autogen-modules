@@ -181,6 +181,12 @@ def output_of(operand):
     return var if record == harness.VESSEL else operand
 
 
+def item_outputs(items):
+    """The model outputs (output_of) the operands of obs_data ``items`` name, sorted; an item computed
+    from other items (operands [""], e.g. a division of two items named in its operation_kwargs) names none."""
+    return sorted({output_of(op) for i in items for op in i['operands'] if op})
+
+
 def series_from_obs_data(obs):
     """{output: (t, values)} from the series items of an obs_data dict (output_of)."""
     out = {}
@@ -237,11 +243,29 @@ def constant_item_curves(obs, z_scores):
 
 
 def read_params_for_id(path):
-    """The entries of a params_for_id JSON file as libcuflynx's in-code form
-    ({vessel_name, param_name, min, max, name_for_plotting})."""
-    from libcuflynx.utilities.params_for_id_helpers import load_params_for_id
-    return [dict(p, name_for_plotting=p.get('name_for_plotting') or p['param_name'])
-            for p in load_params_for_id(path)]
+    """A params_for_id JSON file as its document ({version, params}), which CVS0DParamID takes as is.
+    An entry may set several targets, of different variables, to one value; modifier entries are refused
+    (the calibrated values are written to the targets themselves)."""
+    from libcuflynx.utilities.params_for_id_file import read_params_for_id as read
+    doc = read(path)
+    modifiers = [i for i, p in enumerate(doc['params']) if p.get('modifies')]
+    if modifiers:
+        raise ValueError(f'{path}: entries {modifiers} are modifiers, which a module calibration cannot write back')
+    return doc
+
+
+def entry_parameters(entry):
+    """The parameters a params_for_id entry sets, named as output_of names them: "x" for the
+    version's own "mod/x", "record/x" for a test-network neighbour's."""
+    from libcuflynx.utilities.parameter_names import output_model_name
+    targets = entry['targets']
+    return [output_of(output_model_name(t)) for t in ([targets] if isinstance(targets, str) else targets)]
+
+
+def calibrated_values(params_for_id, best):
+    """{parameter: value} of a calibration: each entry's value, in the order of its params_for_id
+    document, set on every parameter it targets."""
+    return {name: float(val) for p, val in zip(params_for_id['params'], best) for name in entry_parameters(p)}
 
 
 def _calibrate_once(cm, v, obs, params_for_id, start_values, tag):
@@ -277,11 +301,7 @@ def _calibrate_once(cm, v, obs, params_for_id, start_values, tag):
         best = np.asarray(pid.get_best_param_vals(), dtype=float).ravel()
         cost = getattr(getattr(pid, 'param_id', None), 'best_cost', None)
         constants = _constant_features(pid.param_id, best) if multi_segment(obs) else None
-    # the version's own parameters by name; a test-network neighbour's (e.g. a validation loop's
-    # afterload) as '<record>/<param>'
-    cal = {(p['param_name'] if p['vessel_name'] == harness.VESSEL else f"{p['vessel_name']}/{p['param_name']}"): float(val)
-           for p, val in zip(params_for_id, best)}
-    return cal, inp['param_id_method'], (float(cost) if cost is not None and np.isfinite(cost) else None), constants
+    return calibrated_values(params_for_id, best), inp['param_id_method'],(float(cost) if cost is not None and np.isfinite(cost) else None), constants
 
 
 def _constant_features(param_id, best):
@@ -365,7 +385,7 @@ def _evaluate(cm, v, val_obs, calibrated, cal_end, features=None):
     series = series_from_obs_data(val_obs)
     t_end = float(val_obs['protocol_info']['sim_times'][0][-1])
     dts = [float(i['obs_dt']) for i in val_obs['data_items'] if i.get('data_type') == 'series']
-    wanted = sorted(set(series) | {output_of(op) for i in constants for op in i['operands']})
+    wanted = sorted(set(series) | set(item_outputs(constants)))
     pre = float(val_obs['protocol_info'].get('pre_times', [0.0])[0])   # e.g. reach periodic steady state first
     run_spec = dict(harness.without_protocol(cm.spec), sim_time=t_end, pre_time=pre, dt=min(dts + [float(cm.spec['dt'])]))
     helper = harness.simulation_helper(cm.model_path, run_spec, solver_info={'rtol': 1e-8, 'atol': 1e-10})
@@ -427,7 +447,7 @@ def run(cm, v):
         by_var = {p.variable_name: p for p in cm.parameters()}
         pss = periodic_steady_state(
             cm, float(obs['protocol_info'].get('pre_times', [0.0])[0]),
-            sorted({output_of(op) for i in obs['data_items'] + (obs.get('prediction_items') or []) for op in i['operands']}),
+            item_outputs(obs['data_items'] + (obs.get('prediction_items') or [])),
             {'parameters/' + _model_name(k, by_var): x for k, x in calibrated.items()})
         if pss is not None and not pss[0]:
             problems.append(f'start {n}: {pss[1]}')
@@ -604,7 +624,7 @@ def apply_plan(version, parameterisation_name, versions=None, systems=None):
     from libcuflynx.utilities import parameters_file as pf
     from cam_testing.library import all_versions, read_parameters
     inst = version.parameterisation(parameterisation_name)
-    names = [p['param_name'] for p in read_params_for_id(inst.params_for_id_path)]
+    names = [n for p in read_params_for_id(inst.params_for_id_path)['params'] for n in entry_parameters(p)]
     if not os.path.isfile(inst.calibrated_parameters_path):
         raise FileNotFoundError(f'{inst.calibrated_parameters_path}: run the calibration first')
     calibrated = {p.variable_name: p.value for p in read_parameters(inst.calibrated_parameters_path)

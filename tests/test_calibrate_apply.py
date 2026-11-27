@@ -241,3 +241,40 @@ def test_a_model_with_a_workflow_gets_the_values_in_its_uncalibrated_set_and_its
     assert [x for x in lines if 'stale' in x] == [
         'system model cat/sys_wf: its calibration workflow is stale: rerun it to refresh its default set '
         '(python -m cam_testing.system write-default cat/sys_wf <run dir>)']
+
+
+def test_an_entry_shared_by_two_variables_sets_and_applies_both(tmp_path):
+    """One params_for_id entry may set several targets of different variables (SGLT1's one K_Na for K_Na_o
+    and K_Na_i): the calibration's value goes to each, and apply writes each."""
+    chamber, versions, systems = _library(str(tmp_path))
+    fit = chamber.parameterisation('fit')
+    pfi.write_params_for_id(fit.params_for_id_path, [
+        {'name': 'mod/E', 'targets': ['mod/E_A', 'mod/k'], 'min': 0.1, 'max': 10, 'prior': 'uniform'},
+        {'targets': ['loop/R'], 'min': 0.1, 'max': 10, 'prior': 'uniform'}])
+    doc = calibrate.read_params_for_id(fit.params_for_id_path)
+    assert calibrate.calibrated_values(doc, [2.5, 0.3]) == {'E_A': 2.5, 'k': 2.5, 'loop/R': 0.3}
+
+    pfi.write_params_for_id(fit.params_for_id_path, doc['params'][:1])
+    _write(fit.calibrated_parameters_path, {'E_A': _leaf(2.5, 'calibrated', 'no'), 'k': _leaf(2.5, 'calibrated', 'no')})
+    with open(fit.calibration_path, 'w') as f:
+        json.dump({'calibrated_parameters': {'E_A': 2.5, 'k': 2.5}}, f)
+    plan = calibrate.apply_plan(chamber, 'fit', versions=versions, systems=systems)
+    own = {c['row']: c['value'] for c in plan if c['path'] == chamber.default_parameterisation.parameters_path}
+    assert own == {'E_A': '2.5', 'k': '2.5'}
+
+
+def test_an_item_computed_from_other_items_names_no_model_output():
+    """SGLT1 parent1992's K0.5 ratios divide two other items (operands [""]): only real operands are outputs."""
+    items = [{'operands': ['mod/v', 'loop/u']}, {'operands': [''], 'operation': 'division',
+                                                 'operation_kwargs': {'x1': 'a', 'x2': 'b'}}]
+    assert calibrate.item_outputs(items) == ['loop/u', 'v']
+
+
+def test_a_modifier_entry_is_refused(tmp_path):
+    import pytest
+    path = str(tmp_path / 'p_params_for_id.json')
+    with open(path, 'w') as f:
+        json.dump({'version': 1, 'params': [{'name': 'scale', 'modifies': ['mod/E_A'], 'function': 'scale',
+                                             'min': 0.5, 'max': 2}]}, f)
+    with pytest.raises(ValueError, match='modifiers'):
+        calibrate.read_params_for_id(path)
