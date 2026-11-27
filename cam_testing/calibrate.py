@@ -198,6 +198,44 @@ def series_item_names(obs):
     return {output_of(i['operands'][0]): i['data_item_name'] for i in obs['data_items'] if i.get('data_type') == 'series'}
 
 
+def constant_item_curves(obs, z_scores):
+    """(curves, points): the scored constant items of an obs_data dict (``z_scores``, {name: {model,
+    data}}) arranged for plots.plot_constant_items, leaving out the items another item references
+    (operation_kwargs, e.g. the two currents of a ratio). A curve is an experiment's items of one
+    quantity (operation, operands and unit), two or more, whose sub-experiments differ in exactly one
+    params_to_change input: {name, input, x, items, model, data, std, unit, held} with ``held`` the
+    experiment's other inputs (a value, or a protocol_traces name). Every other item is a point: {item, model, data, std, unit}."""
+    pi = obs['protocol_info']
+    labels = pi.get('experiment_labels') or []
+    changes = pi.get('params_to_change') or {}
+    referenced = {str(r) for i in obs['data_items'] for r in (i.get('operation_kwargs') or {}).values()}
+    groups = {}
+    for i in obs['data_items']:
+        if i.get('data_type') == 'constant' and i['data_item_name'] in z_scores and i['data_item_name'] not in referenced:
+            key = (int(i.get('experiment_idx', 0)), i.get('operation'), tuple(i['operands']), i.get('unit', ''))
+            groups.setdefault(key, []).append(i)
+    curves, points = [], []
+    for (e, op, operands, unit), items in groups.items():
+        subs = [int(i.get('subexperiment_idx', 0)) for i in items]
+        cond = {k: [v[e][s] for s in subs] for k, v in changes.items()}
+        varying = [k for k, xs in cond.items() if len(set(xs)) > 1]
+        if len(items) < 2 or len(varying) != 1 or not all(isinstance(x, (int, float)) for x in cond[varying[0]]):
+            points += [{'item': i['data_item_name'], 'model': z_scores[i['data_item_name']]['model'],
+                        'data': float(i['value']), 'std': float(i['std']), 'unit': unit} for i in items]
+            continue
+        k = varying[0]
+        order = np.argsort(cond[k], kind='stable')
+        label = labels[e] if e < len(labels) else f'experiment {e}'
+        quantity = ', '.join(output_of(o) for o in operands if o) or op
+        curves.append({'name': f'{label}: {quantity}', 'input': k, 'x': [float(cond[k][j]) for j in order],
+                       'items': [items[j]['data_item_name'] for j in order],
+                       'model': [z_scores[items[j]['data_item_name']]['model'] for j in order],
+                       'data': [float(items[j]['value']) for j in order],
+                       'std': [float(items[j]['std']) for j in order], 'unit': unit,
+                       'held': {h: xs[0] for h, xs in cond.items() if h != k}})
+    return curves, points
+
+
 def read_params_for_id(path):
     """The entries of a params_for_id JSON file as libcuflynx's in-code form
     ({vessel_name, param_name, min, max, name_for_plotting})."""
@@ -438,6 +476,11 @@ def run(cm, v):
                 groups=overlay_groups(inst, [names[k] for k in series]))
         else:
             saved = []
+        # the constant items: against the input their experiment varies, or as z-scores
+        curves, points = constant_item_curves(val_obs, z_s)
+        saved += plots.plot_constant_items(
+            path_of, curves, points, f'{component.label}: calibrated ({label})',
+            groups=overlay_groups(inst, [i for c in curves for i in c['items']]), z_threshold=z_threshold)
         paths, plot_metrics = item_plots(saved)
         figs += paths
         plot_items += plot_metrics['plot_items']
