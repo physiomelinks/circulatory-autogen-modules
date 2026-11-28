@@ -278,7 +278,7 @@
       "directories": []
     },
     "system_uncalibrated": {
-      "description": "The calibration workflow's input: uncalibrated_parameters.json (the values it starts from, which a module recalibration writes into, but a value given its own origin), the workflow {model}_calibration_workflow.json (libcuflynx's), its obs_data and params_for_id, the obs_data files its steps name (prediction and figure protocols) under protocols/, their data sources in SOURCES.md, and notes.",
+      "description": "The calibration workflow's input: uncalibrated_parameters.json (the values it starts from, which a module recalibration writes into, but a value given its own origin), the workflow {model}_calibration_workflow.json (libcuflynx's), its functions file {model}_operation_funcs.py (the operations, cost and modifier functions its steps name; the name libcuflynx's WorkflowBuilder writes), its obs_data and params_for_id, the obs_data files its steps name (prediction and figure protocols) under protocols/, their data sources in SOURCES.md, and notes.",
       "files": {
         "required": [
           "uncalibrated_parameters.json",
@@ -287,6 +287,7 @@
         "optional": [
           "{model}_obs_data.json",
           "{model}_params_for_id.json",
+          "{model}_operation_funcs.py",
           "SOURCES.md"
         ],
         "data_file_pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*\\.(csv|json|txt|md)$"
