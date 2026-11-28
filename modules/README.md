@@ -595,6 +595,7 @@ system_models/<category>/<model>/
       default_calibration.json   with a workflow: the inputs default was calibrated from (written with it)
     uncalibrated/                only for a model with a calibration workflow: the workflow's input
       uncalibrated_parameters.json, <model>_calibration_workflow.json,
+      <model>_operation_funcs.py (its functions file, optional),
       its obs_data and params_for_id, protocols/, SOURCES.md, notes
   <model>_obs_data.json, <model>_params_for_id.json, SOURCES.md   a model without a workflow (optional)
   <model>_parameters_unfinished.json   (optional)

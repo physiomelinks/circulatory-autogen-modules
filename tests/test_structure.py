@@ -31,12 +31,14 @@ def test_system_model_holds_its_parameter_sets_in_parameterisations(tmp_path):
 
 def test_system_model_holds_its_calibration_workflow_in_its_uncalibrated_set(tmp_path):
     """A model with a calibration workflow holds it in parameterisations/uncalibrated/, with the values it starts
-    from, its obs_data, protocols/ and SOURCES.md; its default set may hold the calibration's record. Workflow
+    from, its functions file, its obs_data, protocols/ and SOURCES.md; its default set may hold the calibration's
+    record. Workflow
     files beside the module array, or an uncalibrated set without a workflow, are refused."""
     mdir = _model(tmp_path, ['parameterisations/default/default_parameters.json',
                              'parameterisations/default/default_calibration.json',
                              'parameterisations/uncalibrated/uncalibrated_parameters.json',
                              'parameterisations/uncalibrated/cell_calibration_workflow.json',
+                             'parameterisations/uncalibrated/cell_operation_funcs.py',
                              'parameterisations/uncalibrated/cell_obs_data.json',
                              'parameterisations/uncalibrated/protocols/fig1_obs_data.json',
                              'parameterisations/uncalibrated/SOURCES.md',
@@ -46,5 +48,7 @@ def test_system_model_holds_its_calibration_workflow_in_its_uncalibrated_set(tmp
     (mdir / 'protocols').mkdir()
     (mdir / 'parameterisations' / 'uncalibrated' / 'cell_calibration_workflow.json').unlink()
     (mdir / 'parameterisations' / 'uncalibrated' / 'workflows').mkdir()
+    (mdir / 'parameterisations' / 'uncalibrated' / 'helpers.py').write_text('')
     assert _problems(mdir) == ['unexpected file cell_calibration_workflow.json', 'missing cell_calibration_workflow.json',
+                               'unexpected file helpers.py',
                                'unexpected directory workflows', 'unexpected directory protocols']
